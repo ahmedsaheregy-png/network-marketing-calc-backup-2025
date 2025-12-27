@@ -21,11 +21,23 @@ let tableData = [];
 // تهيئة الصفحة
 // ========================================
 document.addEventListener('DOMContentLoaded', function () {
+    console.log('📊 Calculator.js v2 loaded');
+
+    // 1. إنشاء الجدول الفارغ
     initializeTable();
     attachEventListeners();
+
+    // 2. تحميل البيانات من الشجرة (الأولوية)
     loadFromStorage();
+
+    // 3. إعادة الحساب بعد تحميل البيانات
     calculateAll();
+
     setupFormulaTooltips();
+
+    // Debug: عرض عدد الأعضاء المحملين
+    const totalMembers = parseInt(document.getElementById('totalMembers').textContent) || 0;
+    console.log('📊 إجمالي الأعضاء المحملين في الجدول:', totalMembers);
 });
 
 // ========================================
