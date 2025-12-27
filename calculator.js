@@ -473,8 +473,29 @@ function loadFromStorage() {
     if (treeData) {
         try {
             const data = JSON.parse(treeData);
+
+            // حساب generationCounts من treeStructure مباشرة (أكثر دقة)
+            if (data.treeStructure) {
+                const generationCounts = computeGenerationCountsFromTree(data.treeStructure);
+
+                // تحديث الجدول من بيانات الشجرة المحسوبة
+                for (let i = 1; i < ROWS; i++) {
+                    const gen = i + 1;
+                    if (generationCounts[gen]) {
+                        document.getElementById(`right_${i}`).value = generationCounts[gen].right || 0;
+                        document.getElementById(`left_${i}`).value = generationCounts[gen].left || 0;
+                    } else {
+                        document.getElementById(`right_${i}`).value = 0;
+                        document.getElementById(`left_${i}`).value = 0;
+                    }
+                }
+                console.log('✅ تم تحميل بيانات الجدول من الشجرة التفاعلية (محسوبة من الهيكل)');
+                console.log('إجمالي الأعضاء في الشجرة:', data.totalMembers || 'غير محدد');
+                return;
+            }
+
+            // Fallback: استخدام generationCounts المحفوظة
             if (data.generationCounts) {
-                // تحديث الجدول من بيانات الشجرة
                 for (let i = 1; i < ROWS; i++) {
                     const gen = i + 1;
                     if (data.generationCounts[gen]) {
@@ -485,8 +506,8 @@ function loadFromStorage() {
                         document.getElementById(`left_${i}`).value = 0;
                     }
                 }
-                console.log('✅ تم تحميل بيانات الجدول من الشجرة التفاعلية');
-                return; // انتهى التحميل
+                console.log('✅ تم تحميل بيانات الجدول من generationCounts المحفوظة');
+                return;
             }
         } catch (e) {
             console.error('Error loading tree data:', e);
@@ -508,6 +529,46 @@ function loadFromStorage() {
             console.error('Error loading calc table:', e);
         }
     }
+}
+
+// ========================================
+// حساب generationCounts من هيكل الشجرة مباشرة
+// ========================================
+function computeGenerationCountsFromTree(treeStructure) {
+    const generationCounts = {};
+
+    // الحصول على الجذر
+    const root = treeStructure;
+    if (!root) return generationCounts;
+
+    // دالة للتنقل في الشجرة
+    function traverse(node, isRightBranch) {
+        if (!node) return;
+
+        const gen = node.generation;
+        if (!generationCounts[gen]) {
+            generationCounts[gen] = { right: 0, left: 0 };
+        }
+
+        // لا نحسب الجذر نفسه
+        if (node.id !== root.id) {
+            if (isRightBranch) {
+                generationCounts[gen].right++;
+            } else {
+                generationCounts[gen].left++;
+            }
+        }
+
+        // التنقل للأبناء مع الحفاظ على isRightBranch
+        traverse(node.leftChild, isRightBranch);
+        traverse(node.rightChild, isRightBranch);
+    }
+
+    // بدء التنقل من الفرعين الرئيسيين
+    traverse(root.rightChild, true);  // الفرع الأيمن
+    traverse(root.leftChild, false);  // الفرع الأيسر
+
+    return generationCounts;
 }
 
 // ========================================
