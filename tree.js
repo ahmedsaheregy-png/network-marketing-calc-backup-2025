@@ -105,13 +105,20 @@ const UNBALANCED_TARGET_COUNTS = [
 ];
 
 // ========================================
-// تهيئة الصفحة
+// تهيئة الصفحة - ترتيب صحيح للحفاظ على الشجرة
 // ========================================
 document.addEventListener('DOMContentLoaded', function () {
-    initializeTree();
+    // 1. محاولة تحميل الشجرة المحفوظة أولاً
+    const hasSavedTree = loadFromStorage();
+
+    // 2. إذا لم توجد شجرة محفوظة، إنشاء شجرة جديدة
+    if (!hasSavedTree) {
+        initializeTree();
+    }
+
+    // 3. إعداد Canvas والأحداث
     setupCanvas();
     attachEventListeners();
-    loadFromStorage();
     drawTree();
 });
 
@@ -917,11 +924,15 @@ function loadFromStorage() {
                 if (data.zoomLevel) zoomLevel = data.zoomLevel;
                 if (data.offsetX !== undefined) offsetX = data.offsetX;
                 if (data.offsetY !== undefined) offsetY = data.offsetY;
+
+                console.log('✅ تم استعادة الشجرة المحفوظة');
+                return true; // تم تحميل شجرة محفوظة
             }
         } catch (e) {
             console.error('Error loading from storage:', e);
         }
     }
+    return false; // لا توجد شجرة محفوظة
 }
 
 // البحث عن عضو بالـ ID

@@ -448,14 +448,14 @@ function saveToStorage() {
 }
 
 // ========================================
-// تحميل البيانات
+// تحميل البيانات - مع التزامن التلقائي من الشجرة
 // ========================================
 function loadFromStorage() {
+    // 1. تحميل الإعدادات الأساسية من بيانات الحاسبة
     const saved = localStorage.getItem(STORAGE_KEY + '_calc');
     if (saved) {
         try {
             const data = JSON.parse(saved);
-
             if (data.inputs) {
                 document.getElementById('productPrice').value = data.inputs.productPrice || 330;
                 document.getElementById('deductionPercent').value = data.inputs.deductionPercent || 10;
@@ -463,15 +463,49 @@ function loadFromStorage() {
                 document.getElementById('generationsCount').value = data.inputs.generationsCount || 11;
                 document.getElementById('cap').value = data.inputs.cap || calculateDefaultCap();
             }
+        } catch (e) {
+            console.error('Error loading calc settings:', e);
+        }
+    }
 
+    // 2. تحميل بيانات الجدول من الشجرة التفاعلية (الأولوية)
+    const treeData = localStorage.getItem(STORAGE_KEY + '_tree');
+    if (treeData) {
+        try {
+            const data = JSON.parse(treeData);
+            if (data.generationCounts) {
+                // تحديث الجدول من بيانات الشجرة
+                for (let i = 1; i < ROWS; i++) {
+                    const gen = i + 1;
+                    if (data.generationCounts[gen]) {
+                        document.getElementById(`right_${i}`).value = data.generationCounts[gen].right || 0;
+                        document.getElementById(`left_${i}`).value = data.generationCounts[gen].left || 0;
+                    } else {
+                        document.getElementById(`right_${i}`).value = 0;
+                        document.getElementById(`left_${i}`).value = 0;
+                    }
+                }
+                console.log('✅ تم تحميل بيانات الجدول من الشجرة التفاعلية');
+                return; // انتهى التحميل
+            }
+        } catch (e) {
+            console.error('Error loading tree data:', e);
+        }
+    }
+
+    // 3. إذا لم توجد بيانات شجرة، استخدم بيانات الحاسبة المحفوظة
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
             if (data.table) {
                 for (let i = 1; i < data.table.length && i < ROWS; i++) {
                     document.getElementById(`right_${i}`).value = data.table[i].rightLine || 0;
                     document.getElementById(`left_${i}`).value = data.table[i].leftLine || 0;
                 }
+                console.log('📊 تم تحميل بيانات الجدول من الحاسبة');
             }
         } catch (e) {
-            console.error('Error loading from storage:', e);
+            console.error('Error loading calc table:', e);
         }
     }
 }
