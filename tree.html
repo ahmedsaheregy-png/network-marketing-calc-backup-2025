@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الشجرة التفاعلية - Network Marketing Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>🌳 الشجرة التفاعلية</h1>
+        <p>Interactive Binary Tree</p>
+    </header>
+
+    <!-- التنقل بين الصفحات -->
+    <nav class="page-nav">
+        <a href="index.html" class="nav-link">📊 الحسابات والجداول</a>
+        <a href="tree.html" class="nav-link active">🌳 الشجرة التفاعلية</a>
+    </nav>
+
+    <main class="container tree-page">
+        <section class="section tree-interactive-section">
+            <!-- شريط الأدوات -->
+            <div class="tree-toolbar">
+                <button id="addRandomBtn" class="toolbar-btn btn-green" title="إضافة أعضاء عشوائياً تحت العضو المحدد">
+                    ➕ أضف أعضاء عشوائياً
+                </button>
+                <button id="resetTreeBtn" class="toolbar-btn btn-red" title="حذف كل الأعضاء ما عدا الشخص الأول">
+                    🗑️ تصفير الشجرة
+                </button>
+                <button id="buildDefaultBtn" class="toolbar-btn btn-purple" title="بناء شجرة متوازنة (كل عضو له 2)">
+                    🔄 الوضع الافتراضي
+                </button>
+                <button id="buildUnbalancedBtn" class="toolbar-btn btn-orange" title="بناء شجرة غير متوازنة">
+                    ⚖️ غير متوازن
+                </button>
+
+                <div class="toolbar-divider"></div>
+
+                <button id="zoomInBtn" class="toolbar-btn btn-blue" title="تكبير">🔍+</button>
+                <button id="zoomOutBtn" class="toolbar-btn btn-blue" title="تصغير">🔍-</button>
+                <button id="resetViewBtn" class="toolbar-btn btn-gray" title="إعادة تعيين العرض">↺</button>
+
+                <div class="toolbar-spacer"></div>
+
+                <div class="tree-stats">
+                    <span id="treeInfo">إجمالي الأعضاء: <strong>1</strong></span>
+                    <span id="selectedInfo">المحدد: <strong>الشخص الأول (#1)</strong></span>
+                </div>
+            </div>
+
+            <!-- إعدادات الجراف -->
+            <div class="tree-settings">
+                <div class="setting-group">
+                    <label for="treeGenerations">عدد الأجيال (الستوبر):</label>
+                    <input type="number" id="treeGenerations" value="11" min="1" max="25">
+                </div>
+                <div class="setting-group">
+                    <label for="treeSharePerMember">حصة العضو الواحد:</label>
+                    <input type="number" id="treeSharePerMember" value="2.25" step="0.01">
+                </div>
+            </div>
+
+            <!-- منطقة الرسم -->
+            <div class="canvas-wrapper">
+                <canvas id="treeCanvas"></canvas>
+            </div>
+
+            <!-- تعليمات -->
+            <div class="tree-instructions">
+                <div class="instruction-item">
+                    <span class="instruction-icon">🖱️</span>
+                    <span><strong>النقر على عضو:</strong> تحديد العضو وعرض معلوماته</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-icon">✋</span>
+                    <span><strong>السحب:</strong> تحريك الشجرة</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-icon">🔍</span>
+                    <span><strong>عجلة الماوس:</strong> تكبير/تصغير</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-icon">⌨️</span>
+                    <span><strong>أسهم لوحة المفاتيح:</strong> التحريك</span>
+                </div>
+            </div>
+
+            <!-- معلومات العضو المحدد -->
+            <div id="memberInfoPanel" class="member-info-panel">
+                <h3>📋 معلومات العضو المحدد</h3>
+                <div class="member-info-content">
+                    <div class="info-row">
+                        <span class="info-label">كود العضو:</span>
+                        <span id="infoMemberId" class="info-value">#1</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">الجيل:</span>
+                        <span id="infoGeneration" class="info-value">1</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">حجم الفريق:</span>
+                        <span id="infoTeamSize" class="info-value">1</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">الفرع الأيمن:</span>
+                        <span id="infoRightCount" class="info-value">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">الفرع الأيسر:</span>
+                        <span id="infoLeftCount" class="info-value">0</span>
+                    </div>
+                    <hr>
+                    <div class="info-row highlight">
+                        <span class="info-label">💰 العمولة (بدون ستوبر):</span>
+                        <span id="infoCommNoStopper" class="info-value">0.00</span>
+                    </div>
+                    <div class="info-row highlight">
+                        <span class="info-label">💰 العمولة (بالستوبر):</span>
+                        <span id="infoCommWithStopper" class="info-value">0.00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">👥 عدد المستفيدين منه:</span>
+                        <span id="infoBeneficiaries" class="info-value">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>⚠️ <strong>تنبيه:</strong> البيانات تُحفظ تلقائياً وتُنقل لصفحة الحسابات</p>
+        <p>© 2025 Network Marketing Calculator</p>
+    </footer>
+
+    <!-- نافذة إضافة أعضاء -->
+    <div id="addMembersModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>➕ إضافة أعضاء</h3>
+            <p id="addUnderInfo">الإضافة تحت العضو رقم: #1</p>
+            <div class="modal-input-group">
+                <label for="membersToAdd">عدد الأعضاء المراد إضافتهم:</label>
+                <input type="number" id="membersToAdd" value="10" min="1">
+            </div>
+            <div class="modal-buttons">
+                <button id="confirmAddBtn" class="modal-btn btn-green">✅ إضافة</button>
+                <button id="cancelAddBtn" class="modal-btn btn-gray">❌ إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="tree.js"></script>
+</body>
+
+</html>

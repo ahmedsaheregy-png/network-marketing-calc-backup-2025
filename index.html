@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة التسويق الشبكي - Network Marketing Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>🧮 حاسبة التسويق الشبكي</h1>
+        <p>Network Marketing Calculator</p>
+    </header>
+
+    <!-- التنقل بين الصفحات -->
+    <nav class="page-nav">
+        <a href="index.html" class="nav-link active">📊 الحسابات والجداول</a>
+        <a href="tree.html" class="nav-link">🌳 الشجرة التفاعلية</a>
+    </nav>
+
+    <main class="container">
+        <!-- القسم الأول: البيانات المدخلة -->
+        <section class="section inputs-section">
+            <h2>📊 القسم الأول - البيانات المدخلة</h2>
+
+            <div class="inputs-grid">
+                <div class="input-group">
+                    <label for="productPrice">سعر المنتج:</label>
+                    <input type="number" id="productPrice" value="330" class="manual-input">
+                </div>
+
+                <div class="input-group">
+                    <label for="deductionPercent">النسبة المقتطعة (%):</label>
+                    <input type="number" id="deductionPercent" value="10" class="manual-input">
+                </div>
+
+                <div class="input-group">
+                    <label for="deductedAmount">المبلغ المقتطع:</label>
+                    <input type="text" id="deductedAmount" readonly class="auto-input"
+                        data-formula="سعر المنتج × (النسبة المقتطعة ÷ 100)">
+                </div>
+
+                <div class="input-group">
+                    <label for="companyPercent">نسبة الشركة من العملية (%):</label>
+                    <input type="number" id="companyPercent" value="25" class="manual-input">
+                </div>
+
+                <div class="input-group">
+                    <label for="companyShare">حصة الشركة من العملية:</label>
+                    <input type="text" id="companyShare" readonly class="auto-input"
+                        data-formula="المبلغ المقتطع × (نسبة الشركة ÷ 100)">
+                </div>
+
+                <div class="input-group">
+                    <label for="membersPercent">نسبة خطة الدخل (%):</label>
+                    <input type="text" id="membersPercent" readonly class="auto-input" data-formula="100 - نسبة الشركة">
+                </div>
+
+                <div class="input-group">
+                    <label for="membersShare">حصة خطة الدخل:</label>
+                    <input type="text" id="membersShare" readonly class="auto-input"
+                        data-formula="المبلغ المقتطع - حصة الشركة">
+                </div>
+
+                <div class="input-group">
+                    <label for="generationsCount">عدد الأجيال (الستوبر):</label>
+                    <input type="number" id="generationsCount" value="11" min="1" max="25" class="manual-input">
+                </div>
+
+                <div class="input-group">
+                    <label for="defaultTotalMembers">إجمالي عدد الأعضاء الافتراضي:</label>
+                    <input type="text" id="defaultTotalMembers" readonly class="auto-input"
+                        data-formula="(2 ^ عدد الأجيال) - 1">
+                </div>
+
+                <div class="input-group">
+                    <label for="sharePerMember">حصة العضو الواحد:</label>
+                    <input type="text" id="sharePerMember" readonly class="auto-input"
+                        data-formula="حصة خطة الدخل ÷ عدد الأجيال">
+                </div>
+
+                <div class="input-group">
+                    <label for="cap">الحد الأقصى (Cap):</label>
+                    <input type="number" id="cap" value="4605" class="manual-input">
+                </div>
+            </div>
+        </section>
+
+        <!-- القسم الثاني: شكل الشجرة -->
+        <section class="section tree-section">
+            <h2>🌳 القسم الثاني - شكل الشجرة (8 أعمدة × 25 صف)</h2>
+            <div class="section-notice">
+                <p>⚠️ <strong>ملاحظة:</strong> الأعمدة (الخط الأيمن والخط الأيسر) تُحدَّث تلقائياً من <a
+                        href="tree.html">الشجرة التفاعلية</a></p>
+                <button id="syncFromTree" class="sync-btn">🔄 تحديث من الشجرة</button>
+            </div>
+
+            <div class="table-container">
+                <table id="treeTable">
+                    <thead>
+                        <tr>
+                            <th>الجيل</th>
+                            <th>الخط الأيمن</th>
+                            <th>الخط الأيسر</th>
+                            <th>إجمالي الأعضاء</th>
+                            <th>عمولات الشخص الأول</th>
+                            <th>العمولات حسب كل عضو<br>(بدون ستوبر)</th>
+                            <th>العمولات حسب كل عضو<br>(مع الستوبر)</th>
+                            <th>العمولات من أسفل لأعلى</th>
+                        </tr>
+                    </thead>
+                    <tbody id="treeBody">
+                        <!-- سيتم إنشاؤها بـ JavaScript -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="totals-row">
+                            <td><strong>الإجمالي</strong></td>
+                            <td id="totalRight" class="auto-cell">0</td>
+                            <td id="totalLeft" class="auto-cell">0</td>
+                            <td id="totalMembers" class="auto-cell">0</td>
+                            <td id="totalFirstPersonComm" class="auto-cell">0.00</td>
+                            <td id="totalNoStopper" class="auto-cell">0.00</td>
+                            <td id="totalWithStopper" class="auto-cell">0.00</td>
+                            <td id="totalBottomUp" class="auto-cell">0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </section>
+
+        <!-- القسم الثالث: المخرجات -->
+        <section class="section outputs-section">
+            <h2>📈 القسم الثالث - المخرجات</h2>
+
+            <div class="outputs-grid">
+                <div class="output-card">
+                    <h3>إجمالي عمولات الشخص الأول</h3>
+                    <p id="firstPersonTotal" class="output-value">0.00</p>
+                    <span class="output-note">(مع تطبيق الـ Cap)</span>
+                </div>
+
+                <div class="output-card">
+                    <h3>ما تم تخصيصه لخطة الدخل</h3>
+                    <p id="totalIncomeEntered" class="output-value">0.00</p>
+                    <span class="output-note">إجمالي الأعضاء × حصة خطة الدخل</span>
+                </div>
+
+                <div class="output-card">
+                    <h3>ما تم توزيعه بالفعل (بالستوبر)</h3>
+                    <p id="totalDistributed" class="output-value">0.00</p>
+                    <span class="output-note">من عمود "العمولات مع الستوبر"</span>
+                </div>
+
+                <div class="output-card verification-card" id="verificationCard">
+                    <h3>خانة التحقق (الفرق)</h3>
+                    <p id="verificationCheck" class="output-value verification-value">0.00</p>
+                    <span class="output-note">يجب أن تساوي صفر</span>
+                </div>
+            </div>
+
+            <!-- زر عرض أعلى 100 -->
+            <div class="top-100-section">
+                <button id="showTop100Btn" class="top100-btn">🏆 عرض أعلى 100 عمولة (Top 100)</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>⚠️ <strong>تنبيه مهم:</strong> يجب عمل نسخة احتياطية من أي تغييرات على GitHub و Database و Server فوراً</p>
+        <p>© 2025 Network Marketing Calculator</p>
+    </footer>
+
+    <!-- نافذة عرض الصيغة -->
+    <div id="formulaTooltip" class="formula-tooltip" style="display: none;"></div>
+
+    <script src="calculator.js"></script>
+</body>
+
+</html>
